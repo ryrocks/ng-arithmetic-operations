@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ErrorCode, Operator, Sign, ConvertOperator, ConvertSign } from './const';
+import { ErrorCode, Sign, ConvertOperator, ConvertSign } from './const';
 import { BehaviorSubject, Observable } from 'rxjs';
+
+export interface ErrorMsg {
+  code: string;
+  msg: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -16,9 +21,9 @@ export class NgArithmeticOperationsService {
 
   // sumSource and errorSource for reactive programing
   private sumSource = new BehaviorSubject('0');
-  private errorSource = new BehaviorSubject({});
-  sumData = this.sumSource.asObservable();
-  errorData = this.errorSource.asObservable();
+  private errorSource = new BehaviorSubject(<ErrorMsg>{});
+  // sumData = this.sumSource.asObservable();
+  // errorData = this.errorSource.asObservable();
 
   constructor() { }
 
@@ -30,8 +35,12 @@ export class NgArithmeticOperationsService {
     return /[+-]?([0-9]*[.])?[0-9]+/g.test(item);
   }
 
-  isSign() {
+  getExpression(): Observable<string> {
+    return this.sumSource;
+  }
 
+  getErrorMsg(): Observable<ErrorMsg> {
+    return this.errorSource;
   }
 
   /**
@@ -39,7 +48,7 @@ export class NgArithmeticOperationsService {
    * @param input from press any number buttons 
    */
   inputKey(key: string) {
-    console.log('Input Key::::', key);
+    // console.log('Input Key::::', key);
 
     if (!ConvertOperator[key] && !this.isNumber(key) && !ConvertSign[key]) {
       this.errorSource.next({
@@ -79,7 +88,7 @@ export class NgArithmeticOperationsService {
 
       }
     }
-    console.log(this.expression);
+    // console.log(this.expression);
   }
 
   displayExpresstion() {
@@ -138,7 +147,7 @@ export class NgArithmeticOperationsService {
           code: ErrorCode.ERR0002,
           msg: 'ERROR INPUT'
         });
-        console.log('ERROR INPUT!!!!');
+        // console.log('ERROR INPUT!!!!');
         return;
       }
     } else {
@@ -163,7 +172,7 @@ export class NgArithmeticOperationsService {
           code: ErrorCode.ERR0002,
           msg: 'ERROR INPUT'
         });
-        console.log('ERROR INPUT!!!!');
+        // console.log('ERROR INPUT!!!!');
         return;
       }
     }
@@ -177,7 +186,7 @@ export class NgArithmeticOperationsService {
         code: ErrorCode.ERR0002,
         msg: 'ERROR INPUT'
       });
-      console.log('ERROR INPUT!!!!');
+      // console.log('ERROR INPUT!!!!');
       return;
     }
 
@@ -199,7 +208,7 @@ export class NgArithmeticOperationsService {
         code: ErrorCode.ERR0002,
         msg: 'ERROR INPUT'
       });
-      console.log('ERROR INPUT!!!!');
+      // console.log('ERROR INPUT!!!!');
       return;
     }
 
