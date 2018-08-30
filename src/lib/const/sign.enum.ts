@@ -3,7 +3,8 @@ export enum Sign {
     REVERSE = 'reverse',
     EQUALS = 'equals',
     RIGHTBASKET = 'rightBasket',
-    LEFTBASKET = 'leftBasket'
+    LEFTBASKET = 'leftBasket',
+    UNDO = 'undo'
 }
 
 export enum ConvertSign {
@@ -11,5 +12,5 @@ export enum ConvertSign {
     reverse = '+/-',
     equals = '=',
     rightBasket = ')',
-    leftBasket = '('
+    leftBasket = '(',
 }

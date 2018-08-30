@@ -11,7 +11,6 @@ export class NgArithmeticOperationsService {
   // sum for general calculate
   private sum: number = 0;
 
-  private totalNumber = '0';
   private nextNumber = '0'
   private expression: string[] = [];
 
@@ -52,10 +51,10 @@ export class NgArithmeticOperationsService {
 
     if (this.isNumber(key) || key === Sign.DOT) {
       this.combineNumber(key);
-      this.sumSource.next(this.expression.join('') + this.nextNumber);
+      this.sumSource.next(this.displayExpresstion() + this.nextNumber);
     } else if (key === Sign.LEFTBASKET || key === Sign.RIGHTBASKET) {
       this.checkValidBasket(key);
-      this.sumSource.next(this.expression.join(''));
+      this.sumSource.next(this.displayExpresstion());
     } else {
 
       this.expression.push(this.nextNumber);
@@ -69,21 +68,33 @@ export class NgArithmeticOperationsService {
       if (this.expression[this.expression.length - 2] === ConvertSign.rightBasket) {
         this.expression.pop();
       }
-      // this.totalNumber = this.nextNumber;
-      
+
       this.nextNumber = '0';
 
       if (key !== Sign.EQUALS) {
         this.expression.push(ConvertOperator[key]);
-        this.sumSource.next(this.expression.join(''));
+        this.sumSource.next(this.displayExpresstion());
       } else {
         this.computeResult();
-        
-      }
-      
 
+      }
     }
     console.log(this.expression);
+  }
+
+  displayExpresstion() {
+    let arr = this.expression
+      .slice()
+      .map(s => {
+        if (s === '*') {
+          return '×';
+        } else if (s === '/') {
+          return '÷'
+        } else {
+          return s;
+        }
+      });
+    return arr.join('');
   }
 
   /**
@@ -121,7 +132,7 @@ export class NgArithmeticOperationsService {
 
       if ((!this.isNumber(this.expression[arrLength - 1]) && this.expression[arrLength - 1] !== ConvertSign.rightBasket) || arrLength === 0) {
         this.expression.push(ConvertSign[key]);
-        
+
       } else {
         this.errorSource.next({
           code: ErrorCode.ERR0002,
@@ -131,12 +142,8 @@ export class NgArithmeticOperationsService {
         return;
       }
     } else {
-      // if (this.expression[arrLength - 1] !== ConvertSign.rightBasket) {
-        this.expression.push(this.nextNumber);
-        
-        // this.totalNumber = this.nextNumber;
-        this.nextNumber = '0';
-      // }
+      this.expression.push(this.nextNumber);
+      this.nextNumber = '0';
 
       arrLength = this.expression.length; // array length changed, so assign new value
 
@@ -149,7 +156,7 @@ export class NgArithmeticOperationsService {
 
       if ((basket.left > basket.right && this.isNumber(this.expression[arrLength - 1])) || (basket.left > basket.right && this.expression[arrLength - 1] === ConvertSign.rightBasket)) {
         this.expression.push(ConvertSign[key]);
-        
+
       } else {
         this.expression.pop();
         this.errorSource.next({
