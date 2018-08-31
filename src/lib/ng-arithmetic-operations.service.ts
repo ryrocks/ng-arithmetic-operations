@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ErrorCode, Sign, ConvertOperator, ConvertSign } from './const';
+import { ErrorCode, Sign, ConvertOperator, ConvertSign, Operator } from './const';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface ErrorMsg {
@@ -14,16 +14,14 @@ export interface ErrorMsg {
 export class NgArithmeticOperationsService {
 
   // sum for general calculate
-  private sum: number = 0;
+  sum: number = 0;
 
-  private nextNumber = '0'
-  private expression: string[] = [];
+  nextNumber = '0'
+  expression: string[] = [];
 
   // sumSource and errorSource for reactive programing
   private sumSource = new BehaviorSubject('0');
   private errorSource = new BehaviorSubject(<ErrorMsg>{});
-  // sumData = this.sumSource.asObservable();
-  // errorData = this.errorSource.asObservable();
 
   constructor() { }
 
@@ -65,8 +63,13 @@ export class NgArithmeticOperationsService {
       this.checkValidBasket(key);
       this.sumSource.next(this.displayExpresstion());
     } else {
+      this.storeExpression(key);
+    }
+    // console.log(this.expression);
+  }
 
-      this.expression.push(this.nextNumber);
+  storeExpression(key: string) {
+    this.expression.push(this.nextNumber);
 
       /**
        * click operator button will push number every time
@@ -85,12 +88,12 @@ export class NgArithmeticOperationsService {
         this.sumSource.next(this.displayExpresstion());
       } else {
         this.computeResult();
-
       }
-    }
-    // console.log(this.expression);
   }
 
+  /**
+   * convert for display on panel
+   */
   displayExpresstion() {
     let arr = this.expression
       .slice()
@@ -117,6 +120,9 @@ export class NgArithmeticOperationsService {
     this.sumSource.next('0');
   }
 
+  /**
+   * count total of '(' and ')'
+   */
   countBasket() {
     let left = 0, right = 0;
 
@@ -165,7 +171,12 @@ export class NgArithmeticOperationsService {
 
       if ((basket.left > basket.right && this.isNumber(this.expression[arrLength - 1])) || (basket.left > basket.right && this.expression[arrLength - 1] === ConvertSign.rightBasket)) {
         this.expression.push(ConvertSign[key]);
-
+        arrLength = this.expression.length;
+        if (this.isNumber(this.expression[arrLength - 2]) && this.expression[arrLength - 3] === ConvertSign.rightBasket) {
+          this.expression.pop();
+          this.expression.pop();
+          this.expression.push(ConvertSign[key]);
+        }
       } else {
         this.expression.pop();
         this.errorSource.next({
@@ -178,6 +189,11 @@ export class NgArithmeticOperationsService {
     }
   }
 
+  /**
+   * 
+   * @param input 
+   * combine each digit and store into this.nextNumber
+   */
   combineNumber(input: string) {
     input = input === Sign.DOT ? ConvertSign.dot : input;
 
@@ -213,7 +229,7 @@ export class NgArithmeticOperationsService {
     }
 
     result = eval(this.expression.join(''));
-    this.sumSource.next(result.toString());
+    this.sumSource.next(result.toFixed(8));
     this.expression = [];
   }
 
