@@ -229,11 +229,21 @@ export class NgArithmeticOperationsService {
     }
 
     result = eval(this.expression.join(''));
-    this.sumSource.next(result.toFixed(8));
+    if (this.precision(result) >= 8) {
+      this.sumSource.next(result.toFixed(8));
+    } else {
+      this.sumSource.next(result.toString());
+    }
+    
     this.expression = [];
   }
 
-
+  precision(a) {
+    if (!isFinite(a)) return 0;
+    var e = 1, p = 0;
+    while (Math.round(a * e) / e !== a) { e *= 10; p++; }
+    return p;
+  }
 
   /**
    * 
